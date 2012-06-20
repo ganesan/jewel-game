@@ -1,0 +1,106 @@
+.board {
+	position: relative;
+	margin: 0 auto;
+	
+	overflow: hidden;
+}
+
+h1 {
+	text-align: center;
+	font: normal 32px 'Spirax', cursive;
+	color: red;
+	text-shadow: 0px 1px black;
+	
+	margin: 0;
+}
+
+h1 em {
+	font: normal 12px Arial;
+	color: black;
+	text-shadow: none;
+}
+
+a {
+	color: black;
+}
+
+h2.scores {
+	text-align: center;
+	font: normal 24px 'Press Start 2P', cursive;
+}
+
+.jewel {
+	border-radius: 10px;
+	position: absolute;
+	
+	transition: top 300ms ease-in 0s, left 300ms ease-in 0s;
+	
+	-webkit-transition: top 300ms ease-in 0s, left 300ms ease-in 0s;
+	-moz-transition: top 300ms ease-in 0s, left 300ms ease-in 0s;
+	-ms-transition: top 300ms ease-in 0s, left 300ms ease-in 0s;
+	-o-transition: top 300ms ease-in 0s, left 300ms ease-in 0s;
+}
+
+.jewel.orange {
+	border: 1px solid #cd7712;
+	background: rgb(179,100,4);
+	background-image: linear-gradient(right top, rgb(232,161,80) 0%, rgb(179,100,4) 100%);
+	background-image: -webkit-linear-gradient(right top, rgb(232,161,80) 0%, rgb(179,100,4) 100%);
+	background-image: -moz-linear-gradient(right top, rgb(232,161,80) 0%, rgb(179,100,4) 100%);
+	background-image: -ms-linear-gradient(right top, rgb(232,161,80) 0%, rgb(179,100,4) 100%);
+	background-image: -o-linear-gradient(right top, rgb(232,161,80) 0%, rgb(179,100,4) 100%);
+}
+
+.jewel.blue {
+	border: 1px solid #85d1de;
+	background: rgb(26,157,177);
+	background-image: linear-gradient(right top, rgb(193,226,232) 0%, rgb(26,157,177) 100%);
+	background-image: -webkit-linear-gradient(right top, rgb(193,226,232) 0%, rgb(26,157,177) 100%);
+	background-image: -moz-linear-gradient(right top, rgb(193,226,232) 0%, rgb(26,157,177) 100%);
+	background-image: -ms-linear-gradient(right top, rgb(193,226,232) 0%, rgb(26,157,177) 100%);
+	background-image: -o-linear-gradient(right top, rgb(193,226,232) 0%, rgb(26,157,177) 100%);
+}
+
+.jewel.green {
+	border: 1px solid #4f714d;
+	background: rgb(65,99,65);
+	background-image: linear-gradient(right top, rgb(126,146,119) 0%, rgb(65,99,65) 100%);
+	background-image: -webkit-linear-gradient(right top, rgb(126,146,119) 0%, rgb(65,99,65) 100%);
+	background-image: -moz-linear-gradient(right top, rgb(126,146,119) 0%, rgb(65,99,65) 100%);
+	background-image: -ms-linear-gradient(right top, rgb(126,146,119) 0%, rgb(65,99,65) 100%);
+	background-image: -o-linear-gradient(right top, rgb(126,146,119) 0%, rgb(65,99,65) 100%);
+}
+
+.jewel.red {
+	border: 1px solid #914e31;
+	background: rgb(144,77,49);
+	background-image: linear-gradient(right top, rgb(199,120,81) 0%, rgb(144,77,49) 100%);
+	background-image: -webkit-linear-gradient(right top, rgb(199,120,81) 0%, rgb(144,77,49) 100%);
+	background-image: -moz-linear-gradient(right top, rgb(199,120,81) 0%, rgb(144,77,49) 100%);
+	background-image: -ms-linear-gradient(right top, rgb(199,120,81) 0%, rgb(144,77,49) 100%);
+	background-image: -o-linear-gradient(right top, rgb(199,120,81) 0%, rgb(144,77,49) 100%);
+}
+
+.jewel.yellow {
+	border: 1px solid #fcd327;
+	background: rgb(217,178,7);
+	background-image: linear-gradient(right top, rgb(247,230,153) 0%, rgb(217,178,7) 100%);
+	background-image: -webkit-linear-gradient(right top, rgb(247,230,153) 0%, rgb(217,178,7) 100%);
+	background-image: -moz-linear-gradient(right top, rgb(247,230,153) 0%, rgb(217,178,7) 100%);
+	background-image: -ms-linear-gradient(right top, rgb(247,230,153) 0%, rgb(217,178,7) 100%);
+	background-image: -o-linear-gradient(right top, rgb(247,230,153) 0%, rgb(217,178,7) 100%);
+}
+
+.jewel.brown {
+	border: 1px solid #66441e;
+	background: rgb(72,42,8);
+	background-image: linear-gradient(right top, rgb(120,84,44) 0%, rgb(72,42,8) 100%);
+	background-image: -webkit-linear-gradient(right top, rgb(120,84,44) 0%, rgb(72,42,8) 100%);
+	background-image: -moz-linear-gradient(right top, rgb(120,84,44) 0%, rgb(72,42,8) 100%);
+	background-image: -ms-linear-gradient(right top, rgb(120,84,44) 0%, rgb(72,42,8) 100%);
+	background-image: -o-linear-gradient(right top, rgb(120,84,44) 0%, rgb(72,42,8) 100%);
+}
+
+.jewel.selected {
+	outline: 2px dashed #aaa;
+}
