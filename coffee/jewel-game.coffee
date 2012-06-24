@@ -267,7 +267,8 @@ window.eur00t.jewel.Game.prototype._initialize = ->
     obj: null
     i: -1
     j: -1
-  
+    
+  @_refreshScores()
   @_clearBoard(true)
 
   @board.on 'click', '.jewel', (e) =>

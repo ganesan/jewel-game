@@ -365,6 +365,7 @@
       i: -1,
       j: -1
     };
+    this._refreshScores();
     this._clearBoard(true);
     return this.board.on('click', '.jewel', function(e) {
       var data, destroyedFlag, destroyedFlag0, i, j;

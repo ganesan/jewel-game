@@ -24,7 +24,7 @@
 	<target name="concatenate">
 		<concat destfile="${build.dir}/jewels-game.js" fixlastline="yes" eol="crlf">
 			<header>/*! Build Time: ${build.time} */</header>
-			<fileset dir="${src.dir}" includes="**/*.js" excludes=""/>
+			<fileset dir="${src.dir}" includes="**/*.js" excludes="main.js"/>
 		</concat>
 	</target>
 	
