@@ -27,7 +27,7 @@
   */
 
 
-  eur00t.templates.jewel.scores = "<h2 class=\"scores\"></h2>";
+  eur00t.templates.jewel.scores = "<div class=\"caption\">\n  <h2 class=\"scores\"></h2>\n</div>";
 
   /*
     Jewel template.

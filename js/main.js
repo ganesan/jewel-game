@@ -3,7 +3,7 @@
 
   $(function() {
     eur00t.template.compileTemplates();
-    return window.game = new eur00t.jewel.Game;
+    return window.game = new eur00t.jewel.Game(null, 21, 10);
   });
 
 }).call(this);

@@ -16,7 +16,9 @@ eur00t.templates.jewel.board = """
   Scores template.
 ###
 eur00t.templates.jewel.scores = """
-  <h2 class="scores"></h2>
+  <div class="caption">
+    <h2 class="scores"></h2>
+  </div>
 """
 
 ###

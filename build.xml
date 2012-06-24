@@ -1,0 +1,42 @@
+<project name="jewels-game" default="version">
+	<loadproperties srcfile="build.properties" />
+	
+	<import file="d:\nzakas-buildr\buildr.xml"/>
+	
+	<tstamp>
+		<format property="build.time"
+		pattern="MMMM d, yyyy hh:mm:ss"
+		locale="en,US"/>
+	</tstamp>
+	
+	<target name="version">
+		<echo>Version is ${version}</echo>
+	</target>
+	
+	<target name="init">
+		<mkdir dir="${build.dir}"/>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${build.dir}"/>
+	</target>
+	
+	<target name="concatenate">
+		<concat destfile="${build.dir}/jewels-game.js" fixlastline="yes" eol="crlf">
+			<header>/*! Build Time: ${build.time} */</header>
+			<fileset dir="${src.dir}" includes="**/*.js" excludes=""/>
+		</concat>
+	</target>
+	
+	<target name="minify">
+		<closure outputdir="${build.dir}" compilation-level="${closure.options}">
+			<fileset dir="${build.dir}" includes="*.js" />
+		</closure>
+	</target>
+	
+	<target name="build.dev" depends="clean,init,concatenate">
+	</target>
+	
+	<target name="build.release" depends="build.dev,minify">
+	</target>
+</project>
