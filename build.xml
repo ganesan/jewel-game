@@ -1,7 +1,7 @@
 <project name="jewels-game" default="version">
 	<loadproperties srcfile="build.properties" />
 	
-	<import file="d:\nzakas-buildr\buildr.xml"/>
+	<import file="./lib/buildr/buildr.xml"/>
 	
 	<tstamp>
 		<format property="build.time"
