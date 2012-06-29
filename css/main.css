@@ -1,3 +1,108 @@
+@keyframes bomb-anim {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@-webkit-keyframes bomb-anim {
+	0% {
+		-webkit-transform: rotate(0deg);
+	}
+	100% {
+		-webkit-transform: rotate(360deg);
+	}
+}
+
+@-moz-keyframes bomb-anim {
+	0% {
+		-moz-transform: rotate(0deg);
+	}
+	100% {
+		-moz-transform: rotate(360deg);
+	}
+}
+
+@-ms-keyframes bomb-anim {
+	0% {
+		-ms-transform: rotate(0deg);
+	}
+	100% {
+		-ms-transform: rotate(360deg);
+	}
+}
+
+@-o-keyframes bomb-anim {
+	0% {
+		-o-transform: rotate(0deg);
+	}
+	100% {
+		-o-transform: rotate(360deg);
+	}
+}
+
+@keyframes colorbomb-anim {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.2;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@-webkit-keyframes colorbomb-anim {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.2;
+	}
+	100% {
+		opacity: 1;
+	}
+}
+
+@-moz-keyframes colorbomb-anim {
+	0% {
+		-moz-transform: scale(1);
+	}
+	50% {
+		-moz-transform: scale(1.2);
+	}
+	100% {
+		-moz-transform: scale(1);
+	}
+}
+
+@-ms-keyframes colorbomb-anim {
+	0% {
+		-ms-transform: scale(1);
+	}
+	50% {
+		-ms-transform: scale(1.2);
+	}
+	100% {
+		-ms-transform: scale(1);
+	}
+}
+
+@-o-keyframes colorbomb-anim {
+	0% {
+		-o-transform: scale(1);
+	}
+	50% {
+		-o-transform: scale(1.2);
+	}
+	100% {
+		-o-transform: scale(1);
+	}
+}
+			
 .board {
 	position: relative;
 	margin: 0 auto;
@@ -57,12 +162,34 @@ h2.scores {
 	border-radius: 10px;
 	position: absolute;
 
-	transition: top 300ms ease-in 0s, left 300ms ease-in 0s;
+	transition: top 150ms ease-in 0s, left 150ms ease-in 0s;
 	
-	-webkit-transition: top 300ms ease-in 0s, left 300ms ease-in 0s;
+	-webkit-transition: top 150ms ease-in 0s, left 150ms ease-in 0s;
 	-moz-transition: top 300ms ease-in 0s, left 300ms ease-in 0s;
 	-ms-transition: top 300ms ease-in 0s, left 300ms ease-in 0s;
 	-o-transition: top 300ms ease-in 0s, left 300ms ease-in 0s;
+}
+
+.jewel.special {
+	z-index: 1000;
+}
+
+.jewel.special.bomb {
+	animation: bomb-anim 1000ms linear infinite;
+	
+	-webkit-animation: bomb-anim 1000ms linear infinite;
+	-moz-animation: bomb-anim 1000ms linear infinite;
+	-ms-animation: bomb-anim 1000ms linear infinite;
+	-o-animation: bomb-anim 1000ms linear infinite;
+}
+
+.jewel.special.colorbomb  {
+	animation: colorbomb-anim 1000ms linear infinite;
+	
+	-webkit-animation: colorbomb-anim 1000ms linear infinite;
+	-moz-animation: colorbomb-anim 1000ms linear infinite;
+	-ms-animation: colorbomb-anim 1000ms linear infinite;
+	-o-animation: colorbomb-anim 1000ms linear infinite;
 }
 
 .jewel.orange {
@@ -126,5 +253,4 @@ h2.scores {
 }
 
 .jewel.selected {
-	outline: 2px dashed #aaa;
-}
+	opacity: 0.7;
