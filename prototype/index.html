@@ -5,6 +5,45 @@
 		<title>index</title>
 		<meta name="viewport" content="width=device-width; initial-scale=1.0" />
 		<style>
+			@-webkit-keyframes font-size-anim {
+				from {
+					font-size: 24px;
+					opacity: 1;
+				}
+				to {
+					font-size: 72px;
+					opacity: 0;
+				}
+			}
+			
+			html, body {
+				height: 100%;
+			}
+			
+			.message-container {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+			}
+			
+			.message-container .message {
+				position: absolute;
+				width: 640px;
+				
+				top: -24px;
+				left: -320px;
+				
+				-webkit-animation: font-size-anim 500ms;
+				
+				font: normal 48px Arial;
+				text-align: center;
+			}
+			
+			#test {
+				position: relative;
+				width: 640px;
+				height: 480px;
+			}
 		</style>
 	</head>
 	<body>

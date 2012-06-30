@@ -1,5 +1,5 @@
 window.eur00t = {} unless window.eur00t?
-window.eur00t.jewel = {} unless window.eur00t.jewel?
+window.eur00t.jewels = {} unless window.eur00t.jewels?
 
 ###
   Get random integer function.
@@ -17,12 +17,12 @@ window.eur00t.getRandomInt = (from, to) ->
   Colors of gems. Each color has correspondent CSS class.
   To add new gem type put new color name here and CSS class into main.css.
 ###
-window.eur00t.jewel.COLORS = ['orange', 'brown', 'yellow', 'blue', 'green', 'red']
+window.eur00t.jewels.COLORS = ['orange', 'brown', 'yellow', 'blue', 'green', 'red']
 
 ###
   Value of game speed. 
 ###
-window.eur00t.jewel.SPEED = 300
+window.eur00t.jewels.SPEED = 300
 
 ###
   Main game constructor.
@@ -41,13 +41,13 @@ window.eur00t.jewel.SPEED = 300
     eur00t.template.compileTemplates()
     window.game = new eur00t.jewel.Game null, 21, 10
 ###
-window.eur00t.jewel.Game = (jQueryContainer = $(document.body), boardW = 8, boardH = 8, size=60, gap=2, border=2) ->
+window.eur00t.jewels.Game = (jQueryContainer = $(document.body), boardW = 8, boardH = 8, size=60, gap=2, border=2) ->
   @jQueryContainer = jQueryContainer;
   
-  @board = @_generateGameBoard eur00t.compiledTemplates.jewel.board, boardW, boardH, size, gap
+  @board = @_generateGameBoard eur00t.compiledTemplates.jewels.board, boardW, boardH, size, gap
   
   # The score indicator. 
-  @scoresIndicator = $ eur00t.compiledTemplates.jewel.scores()
+  @scoresIndicator = $ eur00t.compiledTemplates.jewels.scores()
   
   # This is matrix for elements of board. If (i, j) is empty, @matrix[i][j] equal null.
   @matrix = []
@@ -55,6 +55,9 @@ window.eur00t.jewel.Game = (jQueryContainer = $(document.body), boardW = 8, boar
   @size = size
   @gap = gap
   @border = border
+  
+  # Depth indicator of destroy chain
+  @waveNumber = 0
   
   # The scores variable. Each destroyed gem adds 1 to total score.
   @scores = 0
@@ -66,7 +69,7 @@ window.eur00t.jewel.Game = (jQueryContainer = $(document.body), boardW = 8, boar
   for i in [0...boardH]
     @matrix.push []
     for j in [0...boardW]
-      _item = @_generateItem eur00t.compiledTemplates.jewel.item, size, gap, i, j, border
+      _item = @_generateItem eur00t.compiledTemplates.jewels.item, size, gap, i, j, border
       _item.elem.data
         i: i
         j: j
@@ -75,6 +78,7 @@ window.eur00t.jewel.Game = (jQueryContainer = $(document.body), boardW = 8, boar
       @board.append _item.elem
   
   @_initialize()
+  @_initializeEvent()
   
   @
 
@@ -88,7 +92,7 @@ window.eur00t.jewel.Game = (jQueryContainer = $(document.body), boardW = 8, boar
   
   return value:   jQuery wrapper for generated DOM element
 ###
-window.eur00t.jewel.Game.prototype._generateGameBoard = (template, boardW, boardH, size, gap) ->
+window.eur00t.jewels.Game.prototype._generateGameBoard = (template, boardW, boardH, size, gap) ->
   $ template
     width: boardW * (size + 2 * gap)
     height: boardH * (size + 2 * gap)
@@ -109,8 +113,8 @@ window.eur00t.jewel.Game.prototype._generateGameBoard = (template, boardW, board
     }
   }
 ###
-window.eur00t.jewel.Game.prototype._generateItem = (template, size, gap, i, j, border) ->
-  color = eur00t.jewel.COLORS[eur00t.getRandomInt eur00t.jewel.COLORS.length - 1]
+window.eur00t.jewels.Game.prototype._generateItem = (template, size, gap, i, j, border) ->
+  color = eur00t.jewels.COLORS[eur00t.getRandomInt eur00t.jewels.COLORS.length - 1]
   
   elem: $ template
     color: color
@@ -124,9 +128,9 @@ window.eur00t.jewel.Game.prototype._generateItem = (template, size, gap, i, j, b
     color: color
 
 # Cancel privious selection. Returns system into unselected state.
-window.eur00t.jewel.Game.prototype._cancelPreviousSelect = ->
+window.eur00t.jewels.Game.prototype._cancelPreviousSelect = ->
   if @selected.obj?
-    @selected.obj.removeClass 'selected' if @selected.obj?
+    @selected.obj.removeClass 'selected'
     @selected.obj = null
     @selected.i = -1
     @selected.j = -1
@@ -134,16 +138,18 @@ window.eur00t.jewel.Game.prototype._cancelPreviousSelect = ->
   else false
 
 # Select item at (i, j) coordinates
-window.eur00t.jewel.Game.prototype._selectItem = (i, j) ->
-  @_cancelPreviousSelect()
-  
-  @selected.obj = @matrix[i][j]
-  @selected.i = i
-  @selected.j = j
-  @selected.obj.addClass 'selected'
+window.eur00t.jewels.Game.prototype._selectItem = (i, j) ->
+  if (i != @selected.i) || (j != @selected.j)
+    @_cancelPreviousSelect()
+    @selected.obj = @matrix[i][j]
+    @selected.i = i
+    @selected.j = j
+    @selected.obj.addClass 'selected'
+  else
+    @_cancelPreviousSelect()
 
 # Set position of elem to (i, j)
-window.eur00t.jewel.Game.prototype._setPosition = (elem, i, j) ->
+window.eur00t.jewels.Game.prototype._setPosition = (elem, i, j) ->
   if elem != null
     elem.css
       left: @gap + j * (@size + 2 * @gap) - @border
@@ -154,7 +160,7 @@ window.eur00t.jewel.Game.prototype._setPosition = (elem, i, j) ->
       j: j
 
 # Swap position of two elements
-window.eur00t.jewel.Game.prototype._swapItems = (i0, j0, i, j) ->
+window.eur00t.jewels.Game.prototype._swapItems = (i0, j0, i, j) ->
   from = @matrix[i0][j0]
   to = @matrix[i][j]
   
@@ -166,7 +172,7 @@ window.eur00t.jewel.Game.prototype._swapItems = (i0, j0, i, j) ->
   true
 
 # Check if elements with coords (i0, j0) and (i, j) have equal color
-window.eur00t.jewel.Game.prototype._ifEqualType = (i0, j0, i, j) ->
+window.eur00t.jewels.Game.prototype._ifEqualType = (i0, j0, i, j) ->
   @matrix[i0][j0].data('color') == @matrix[i][j].data('color')
 
 ###
@@ -180,23 +186,24 @@ window.eur00t.jewel.Game.prototype._ifEqualType = (i0, j0, i, j) ->
     true  - if element is destroyed
     false - if not
 ###
-window.eur00t.jewel.Game.prototype._destroyObj = (i, j, hidden, nospecial) ->
+window.eur00t.jewels.Game.prototype._destroyObj = (i, j, hidden, nospecial) ->
   if (0 <= i < @boardH) && (0 <= j < @boardW) && (@matrix[i][j] isnt null)
     @_processSpecial i, j if !nospecial
-    if !hidden
-      # jQuery fadeout effect
-      @matrix[i][j].fadeOut window.eur00t.jewel.SPEED
-      @scores += 1
-    else
-      # remove silently
-      @matrix[i][j].remove()
-    @matrix[i][j] = null
+    if @matrix[i][j] isnt null
+      if !hidden
+        # jQuery fadeout effect
+        @matrix[i][j].fadeOut window.eur00t.jewels.SPEED
+        @scores += 1
+      else
+        # remove silently
+        @matrix[i][j].remove()
+      @matrix[i][j] = null
     true
   else false
 
 # Update GUI score indicator
-window.eur00t.jewel.Game.prototype._refreshScores = ->
-  @scoresIndicator.children('h2').text(@scores)
+window.eur00t.jewels.Game.prototype._refreshScores = ->
+  ($ @).trigger 'refresh-scores', @scores
 
 ###
   Process elements that are queued for deletion.
@@ -208,7 +215,7 @@ window.eur00t.jewel.Game.prototype._refreshScores = ->
     count: <a number of destroyed elements>
   }
 ###
-window.eur00t.jewel.Game.prototype._processDestroyResult = (hidden) ->
+window.eur00t.jewels.Game.prototype._processDestroyResult = (hidden) ->
   # a number of destroyed elements
   destroyedCounter = 0
   
@@ -238,7 +245,7 @@ window.eur00t.jewel.Game.prototype._processDestroyResult = (hidden) ->
   iteratorI, iteratorJ: the position of current element that is checked
   postIteration:        function, that calculates next value of iteratorI and iteratorJ
 ###
-window.eur00t.jewel.Game.prototype._processDestroyDirection = (destroyArr, i, j, iteratorI, iteratorJ, postIteration) ->
+window.eur00t.jewels.Game.prototype._processDestroyDirection = (destroyArr, i, j, iteratorI, iteratorJ, postIteration) ->
   while (0 <= iteratorI < @boardH) and (0 <= iteratorJ < @boardW) and (@matrix[iteratorI][iteratorJ] != null) and (@_ifEqualType i, j, iteratorI, iteratorJ)
     destroyArr.push 
       i: iteratorI
@@ -252,7 +259,7 @@ window.eur00t.jewel.Game.prototype._processDestroyDirection = (destroyArr, i, j,
   true
 
 # Find vertical elements to destroy
-window.eur00t.jewel.Game.prototype._destroyLinearVertical = (i, j, hidden) ->
+window.eur00t.jewels.Game.prototype._destroyLinearVertical = (i, j, hidden) ->
   @_processDestroyDirection @destroyV, i, j, i + 1, j, (i, j) -> 
     iteratorI: i + 1
     iteratorJ: j
@@ -264,7 +271,7 @@ window.eur00t.jewel.Game.prototype._destroyLinearVertical = (i, j, hidden) ->
   true
 
 # Find horizontal elements to destroy
-window.eur00t.jewel.Game.prototype._destroyLinearHorizontal = (i, j, hidden) ->
+window.eur00t.jewels.Game.prototype._destroyLinearHorizontal = (i, j, hidden) ->
   @_processDestroyDirection @destroyH, i, j, i, j + 1, (i, j) -> 
     iteratorI: i
     iteratorJ: j + 1
@@ -275,14 +282,13 @@ window.eur00t.jewel.Game.prototype._destroyLinearHorizontal = (i, j, hidden) ->
 
   true
 
-# Check if (i, j) is elements that can be selected
-window.eur00t.jewel.Game.prototype._checkIfSelectable = (i, j, hidden) ->
+# Check if (i, j) is element that can be selected
+window.eur00t.jewels.Game.prototype._checkIfSelectable = (i, j, hidden) ->
   if (@selected.obj == null) 
     true
   else if ((@selected.i == i) and (Math.abs(@selected.j - j) < 2)) or ((@selected.j == j) and (Math.abs(@selected.i - i) < 2))
     if (i == @selected.i) and (j == @selected.j)
-      @_cancelPreviousSelect()
-      false
+      true
     else
       if @_ifEqualType i, j, @selected.i, @selected.j
         true
@@ -296,7 +302,7 @@ window.eur00t.jewel.Game.prototype._checkIfSelectable = (i, j, hidden) ->
   1. Place all available items donw in regard of empty cells.
   2. Generate new items to fill empty space.
 ###
-window.eur00t.jewel.Game.prototype._compactizeBoard = ->
+window.eur00t.jewels.Game.prototype._compactizeBoard = ->
   newMatrix = []
   
   # collect all remaining elements into newMatrix. newMatrix[j] is elements from column number j
@@ -324,7 +330,7 @@ window.eur00t.jewel.Game.prototype._compactizeBoard = ->
       for i in [@boardH - 1 - newMatrix[j].length..0]
         # generate new element
         # new element are positioned behind the top of board
-        _item = @_generateItem eur00t.compiledTemplates.jewel.item, @size, @gap, -iterator, j, @border
+        _item = @_generateItem eur00t.compiledTemplates.jewels.item, @size, @gap, -iterator, j, @border
         @board.append _item.elem
         @matrix[i][j] = _item.elem
         
@@ -351,7 +357,7 @@ window.eur00t.jewel.Game.prototype._compactizeBoard = ->
     count: <a number of destroyed elements>
   }
 ###
-window.eur00t.jewel.Game.prototype._destroyAt = (i, j, hidden, initial) ->
+window.eur00t.jewels.Game.prototype._destroyAt = (i, j, hidden, initial) ->
   @destroyV = []
   @destroyH = []
   
@@ -371,15 +377,16 @@ window.eur00t.jewel.Game.prototype._destroyAt = (i, j, hidden, initial) ->
     ###
     if (destroyedFlag && ((destroyObj.count < 3) || !initial)) || (destroyedFlag && (@matrix[i][j] isnt null) && (@_processSpecial i, j))
       @_destroyObj i, j, hidden
-    
-    ###
-      In case (i, j) wasn't destroyed after previous check AND
-      destruction process is initiated by user AND
-      element were destroyed (in this case destroyObj.count is more than 2)
       
-      (i, j) should be destroyed and should be transformed into special element
-    ###
+      ###
+        In case (i, j) wasn't destroyed after previous check AND
+        destruction process is initiated by user AND
+        element were destroyed (in this case destroyObj.count is more than 2)
+        
+        (i, j) should be destroyed and should be transformed into special element
+      ###
     else if (@matrix[i][j] isnt null) && initial && destroyedFlag
+    
       @matrix[i][j].addClass 'special'
       
       if destroyObj.count == 3
@@ -391,16 +398,24 @@ window.eur00t.jewel.Game.prototype._destroyAt = (i, j, hidden, initial) ->
           special: 'colorbomb'
         @matrix[i][j].addClass 'colorbomb'
     
-    @_refreshScores() if !hidden
+    @_refreshScores() if !hidden && destroyedFlag
     
     destroyed: destroyedFlag
     count: destroyObj.count
   else
     destroyed: false
     count: 0
+    
+window.eur00t.jewels.Game.prototype._processWave = (i) ->
+  if i?
+    @waveNumber = 0
+  else 
+    @waveNumber += 1
+  
+  ($ @).trigger 'refresh-wave', @waveNumber
 
 # Clear board. This process is initiated each time new element are added to the board.
-window.eur00t.jewel.Game.prototype._clearBoard = (hidden) ->
+window.eur00t.jewels.Game.prototype._clearBoard = (hidden) ->
   destroyedFlag = false
   for i in [0...@boardH]
     for j in [0...@boardW]
@@ -409,50 +424,91 @@ window.eur00t.jewel.Game.prototype._clearBoard = (hidden) ->
   
   if destroyedFlag
     if !hidden
+      # Process destroy chain, send event about new value of chain depth
+      @_processWave()
+      
       # If elements were destroyed, compactize the board and perform clear process
-      setTimeout (=> @_compactizeBoard()), window.eur00t.jewel.SPEED
-      setTimeout (=> @_clearBoard()), window.eur00t.jewel.SPEED * 2
+      setTimeout (=> @_compactizeBoard()), window.eur00t.jewels.SPEED
+      setTimeout (=> @_clearBoard()), window.eur00t.jewels.SPEED * 2
     else
       @_compactizeBoard()
       @_clearBoard(hidden)
 
+# Remove special state of (i, j) element
+window.eur00t.jewels.Game.prototype._cancelSpecial = (i, j) ->
+  @matrix[i][j].data
+    special: null
+
 # Process deletion of special Bomb element at (i, j)
 # This will delete the row number i and column number j
-window.eur00t.jewel.Game.prototype._processSpecialBomb = (i, j) ->
+window.eur00t.jewels.Game.prototype._processSpecialBomb = (i, j) ->
+  @_displayMessage 'Booooom!', 48
+  
   for j0 in [0...@boardW]
-    @_destroyObj i, j0, false, true if j0 != j
+    @_destroyObj i, j0 if j0 != j
   
   for i0 in [0...@boardH]
-    @_destroyObj i0, j, false, true if i0 != i
+    @_destroyObj i0, j if i0 != i
   
   true
 
 # Process deletion of special Color Bomb element at (i, j)
 # All element with equal color will be deleted
-window.eur00t.jewel.Game.prototype._processSpecialColorBomb = (i, j) ->
+window.eur00t.jewels.Game.prototype._processSpecialColorBomb = (i, j) ->
+  @_displayMessage 'Color Bomb!', 48
+  
   color = @matrix[i][j].data().color
   
   for j0 in [0...@boardW]
     for i0 in [0...@boardH]
       if ((j0 != j) || (i0 != i)) && (@matrix[i0][j0] isnt null) && (@matrix[i0][j0].data().color == color)
-        @_destroyObj i0, j0, false, true
+        @_destroyObj i0, j0
     
   true
 
 # Process deletion of special element.
-window.eur00t.jewel.Game.prototype._processSpecial = (i, j) ->
+window.eur00t.jewels.Game.prototype._processSpecial = (i, j) ->
   data = @matrix[i][j].data()
   
   if data.special?
-    switch data.special
+    specialValue = data.special
+    @_cancelSpecial i, j
+    
+    switch specialValue
       when 'bomb' then @_processSpecialBomb i, j
       when 'colorbomb' then @_processSpecialColorBomb i, j
       
     true
   else false
 
+# Display message with text value
+window.eur00t.jewels.Game.prototype._displayMessage = (text, size) ->
+  waveMessage = $ eur00t.compiledTemplates.jewels.message 
+    text: text
+    size: size
+    
+  @jQueryContainer.append waveMessage
+  
+  setTimeout (-> waveMessage.remove()), 800
+
+###
+  Initialize system events. jQuery custom event is used.
+  All events are triggered on instantiated Game object.
+  
+  'refresh-wave'   - fired every time wave value is changed
+  'refresh-scores' - fired on scores change
+###
+window.eur00t.jewels.Game.prototype._initializeEvent = ->
+  # Display message on each wave change
+  ($ @).on 'refresh-wave', (e, wave) ->
+    if wave != 0
+      @_displayMessage "Wave #{wave}!", 12 + 6 * wave
+  
+  ($ @).on 'refresh-scores', (e, scores) -> 
+    @scoresIndicator.children('h2').text(scores)
+
 # Initialize game process
-window.eur00t.jewel.Game.prototype._initialize = ->
+window.eur00t.jewels.Game.prototype._initialize = ->
   # append Scores Indicator and Board elements to the page
   @jQueryContainer.append @scoresIndicator
   @jQueryContainer.append @board
@@ -461,7 +517,7 @@ window.eur00t.jewel.Game.prototype._initialize = ->
     obj: null
     i: -1
     j: -1
-    
+  
   @_refreshScores()
   
   # perform clear bopard process at mode with no effects
@@ -492,7 +548,9 @@ window.eur00t.jewel.Game.prototype._initialize = ->
           setTimeout (=> @_swapItems i, j, selectedI, selectedJ;), 300
         @_cancelPreviousSelect()
       else
+        @_processWave(0)
+        
         # otherwise compactize and clear board
-        setTimeout (=> @_compactizeBoard()), window.eur00t.jewel.SPEED
-        setTimeout (=> @_clearBoard()), window.eur00t.jewel.SPEED * 2
+        setTimeout (=> @_compactizeBoard()), window.eur00t.jewels.SPEED
+        setTimeout (=> @_clearBoard()), window.eur00t.jewels.SPEED * 2
         @_cancelPreviousSelect()

@@ -3,7 +3,13 @@
 
   $(function() {
     eur00t.template.compileTemplates();
-    return window.game = new eur00t.jewel.Game(null, 21, 10);
+    window.game = new eur00t.jewels.Game(null, 21, 10);
+    ($(window.game)).on('refresh-scores', function(e, scores) {
+      return console.log("Scores: " + scores);
+    });
+    return ($(window.game)).on('refresh-wave', function(e, wave) {
+      return console.log("Wave: " + wave);
+    });
   });
 
 }).call(this);

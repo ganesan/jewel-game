@@ -5,8 +5,8 @@
     window.eur00t = {};
   }
 
-  if (window.eur00t.jewel == null) {
-    window.eur00t.jewel = {};
+  if (window.eur00t.jewels == null) {
+    window.eur00t.jewels = {};
   }
 
   /*
@@ -32,14 +32,14 @@
   */
 
 
-  window.eur00t.jewel.COLORS = ['orange', 'brown', 'yellow', 'blue', 'green', 'red'];
+  window.eur00t.jewels.COLORS = ['orange', 'brown', 'yellow', 'blue', 'green', 'red'];
 
   /*
     Value of game speed.
   */
 
 
-  window.eur00t.jewel.SPEED = 300;
+  window.eur00t.jewels.SPEED = 300;
 
   /*
     Main game constructor.
@@ -60,7 +60,7 @@
   */
 
 
-  window.eur00t.jewel.Game = function(jQueryContainer, boardW, boardH, size, gap, border) {
+  window.eur00t.jewels.Game = function(jQueryContainer, boardW, boardH, size, gap, border) {
     var i, j, _i, _item, _j;
     if (jQueryContainer == null) {
       jQueryContainer = $(document.body);
@@ -81,19 +81,20 @@
       border = 2;
     }
     this.jQueryContainer = jQueryContainer;
-    this.board = this._generateGameBoard(eur00t.compiledTemplates.jewel.board, boardW, boardH, size, gap);
-    this.scoresIndicator = $(eur00t.compiledTemplates.jewel.scores());
+    this.board = this._generateGameBoard(eur00t.compiledTemplates.jewels.board, boardW, boardH, size, gap);
+    this.scoresIndicator = $(eur00t.compiledTemplates.jewels.scores());
     this.matrix = [];
     this.size = size;
     this.gap = gap;
     this.border = border;
+    this.waveNumber = 0;
     this.scores = 0;
     this.boardW = boardW;
     this.boardH = boardH;
     for (i = _i = 0; 0 <= boardH ? _i < boardH : _i > boardH; i = 0 <= boardH ? ++_i : --_i) {
       this.matrix.push([]);
       for (j = _j = 0; 0 <= boardW ? _j < boardW : _j > boardW; j = 0 <= boardW ? ++_j : --_j) {
-        _item = this._generateItem(eur00t.compiledTemplates.jewel.item, size, gap, i, j, border);
+        _item = this._generateItem(eur00t.compiledTemplates.jewels.item, size, gap, i, j, border);
         _item.elem.data({
           i: i,
           j: j,
@@ -104,6 +105,7 @@
       }
     }
     this._initialize();
+    this._initializeEvent();
     return this;
   };
 
@@ -119,7 +121,7 @@
   */
 
 
-  window.eur00t.jewel.Game.prototype._generateGameBoard = function(template, boardW, boardH, size, gap) {
+  window.eur00t.jewels.Game.prototype._generateGameBoard = function(template, boardW, boardH, size, gap) {
     return $(template({
       width: boardW * (size + 2 * gap),
       height: boardH * (size + 2 * gap)
@@ -144,9 +146,9 @@
   */
 
 
-  window.eur00t.jewel.Game.prototype._generateItem = function(template, size, gap, i, j, border) {
+  window.eur00t.jewels.Game.prototype._generateItem = function(template, size, gap, i, j, border) {
     var color;
-    color = eur00t.jewel.COLORS[eur00t.getRandomInt(eur00t.jewel.COLORS.length - 1)];
+    color = eur00t.jewels.COLORS[eur00t.getRandomInt(eur00t.jewels.COLORS.length - 1)];
     return {
       elem: $(template({
         color: color,
@@ -162,11 +164,9 @@
     };
   };
 
-  window.eur00t.jewel.Game.prototype._cancelPreviousSelect = function() {
+  window.eur00t.jewels.Game.prototype._cancelPreviousSelect = function() {
     if (this.selected.obj != null) {
-      if (this.selected.obj != null) {
-        this.selected.obj.removeClass('selected');
-      }
+      this.selected.obj.removeClass('selected');
       this.selected.obj = null;
       this.selected.i = -1;
       this.selected.j = -1;
@@ -176,15 +176,19 @@
     }
   };
 
-  window.eur00t.jewel.Game.prototype._selectItem = function(i, j) {
-    this._cancelPreviousSelect();
-    this.selected.obj = this.matrix[i][j];
-    this.selected.i = i;
-    this.selected.j = j;
-    return this.selected.obj.addClass('selected');
+  window.eur00t.jewels.Game.prototype._selectItem = function(i, j) {
+    if ((i !== this.selected.i) || (j !== this.selected.j)) {
+      this._cancelPreviousSelect();
+      this.selected.obj = this.matrix[i][j];
+      this.selected.i = i;
+      this.selected.j = j;
+      return this.selected.obj.addClass('selected');
+    } else {
+      return this._cancelPreviousSelect();
+    }
   };
 
-  window.eur00t.jewel.Game.prototype._setPosition = function(elem, i, j) {
+  window.eur00t.jewels.Game.prototype._setPosition = function(elem, i, j) {
     if (elem !== null) {
       elem.css({
         left: this.gap + j * (this.size + 2 * this.gap) - this.border,
@@ -197,7 +201,7 @@
     }
   };
 
-  window.eur00t.jewel.Game.prototype._swapItems = function(i0, j0, i, j) {
+  window.eur00t.jewels.Game.prototype._swapItems = function(i0, j0, i, j) {
     var from, to, _ref;
     from = this.matrix[i0][j0];
     to = this.matrix[i][j];
@@ -207,7 +211,7 @@
     return true;
   };
 
-  window.eur00t.jewel.Game.prototype._ifEqualType = function(i0, j0, i, j) {
+  window.eur00t.jewels.Game.prototype._ifEqualType = function(i0, j0, i, j) {
     return this.matrix[i0][j0].data('color') === this.matrix[i][j].data('color');
   };
 
@@ -224,26 +228,28 @@
   */
 
 
-  window.eur00t.jewel.Game.prototype._destroyObj = function(i, j, hidden, nospecial) {
+  window.eur00t.jewels.Game.prototype._destroyObj = function(i, j, hidden, nospecial) {
     if (((0 <= i && i < this.boardH)) && ((0 <= j && j < this.boardW)) && (this.matrix[i][j] !== null)) {
       if (!nospecial) {
         this._processSpecial(i, j);
       }
-      if (!hidden) {
-        this.matrix[i][j].fadeOut(window.eur00t.jewel.SPEED);
-        this.scores += 1;
-      } else {
-        this.matrix[i][j].remove();
+      if (this.matrix[i][j] !== null) {
+        if (!hidden) {
+          this.matrix[i][j].fadeOut(window.eur00t.jewels.SPEED);
+          this.scores += 1;
+        } else {
+          this.matrix[i][j].remove();
+        }
+        this.matrix[i][j] = null;
       }
-      this.matrix[i][j] = null;
       return true;
     } else {
       return false;
     }
   };
 
-  window.eur00t.jewel.Game.prototype._refreshScores = function() {
-    return this.scoresIndicator.children('h2').text(this.scores);
+  window.eur00t.jewels.Game.prototype._refreshScores = function() {
+    return ($(this)).trigger('refresh-scores', this.scores);
   };
 
   /*
@@ -258,7 +264,7 @@
   */
 
 
-  window.eur00t.jewel.Game.prototype._processDestroyResult = function(hidden) {
+  window.eur00t.jewels.Game.prototype._processDestroyResult = function(hidden) {
     var destroyedCounter, obj, _i, _j, _len, _len1, _ref, _ref1;
     destroyedCounter = 0;
     if ((this.destroyH.length >= 2) || (this.destroyV.length >= 2)) {
@@ -300,7 +306,7 @@
   */
 
 
-  window.eur00t.jewel.Game.prototype._processDestroyDirection = function(destroyArr, i, j, iteratorI, iteratorJ, postIteration) {
+  window.eur00t.jewels.Game.prototype._processDestroyDirection = function(destroyArr, i, j, iteratorI, iteratorJ, postIteration) {
     var newIterators;
     while (((0 <= iteratorI && iteratorI < this.boardH)) && ((0 <= iteratorJ && iteratorJ < this.boardW)) && (this.matrix[iteratorI][iteratorJ] !== null) && (this._ifEqualType(i, j, iteratorI, iteratorJ))) {
       destroyArr.push({
@@ -314,7 +320,7 @@
     return true;
   };
 
-  window.eur00t.jewel.Game.prototype._destroyLinearVertical = function(i, j, hidden) {
+  window.eur00t.jewels.Game.prototype._destroyLinearVertical = function(i, j, hidden) {
     this._processDestroyDirection(this.destroyV, i, j, i + 1, j, function(i, j) {
       return {
         iteratorI: i + 1,
@@ -330,7 +336,7 @@
     return true;
   };
 
-  window.eur00t.jewel.Game.prototype._destroyLinearHorizontal = function(i, j, hidden) {
+  window.eur00t.jewels.Game.prototype._destroyLinearHorizontal = function(i, j, hidden) {
     this._processDestroyDirection(this.destroyH, i, j, i, j + 1, function(i, j) {
       return {
         iteratorI: i,
@@ -346,13 +352,12 @@
     return true;
   };
 
-  window.eur00t.jewel.Game.prototype._checkIfSelectable = function(i, j, hidden) {
+  window.eur00t.jewels.Game.prototype._checkIfSelectable = function(i, j, hidden) {
     if (this.selected.obj === null) {
       return true;
     } else if (((this.selected.i === i) && (Math.abs(this.selected.j - j) < 2)) || ((this.selected.j === j) && (Math.abs(this.selected.i - i) < 2))) {
       if ((i === this.selected.i) && (j === this.selected.j)) {
-        this._cancelPreviousSelect();
-        return false;
+        return true;
       } else {
         if (this._ifEqualType(i, j, this.selected.i, this.selected.j)) {
           return true;
@@ -372,7 +377,7 @@
   */
 
 
-  window.eur00t.jewel.Game.prototype._compactizeBoard = function() {
+  window.eur00t.jewels.Game.prototype._compactizeBoard = function() {
     var i, iterator, j, newMatrix, _fn, _i, _item, _j, _k, _l, _m, _ref, _ref1, _ref2, _ref3, _ref4, _ref5,
       _this = this;
     newMatrix = [];
@@ -403,7 +408,7 @@
           }), 0);
         };
         for (i = _m = _ref5 = this.boardH - 1 - newMatrix[j].length; _ref5 <= 0 ? _m <= 0 : _m >= 0; i = _ref5 <= 0 ? ++_m : --_m) {
-          _item = this._generateItem(eur00t.compiledTemplates.jewel.item, this.size, this.gap, -iterator, j, this.border);
+          _item = this._generateItem(eur00t.compiledTemplates.jewels.item, this.size, this.gap, -iterator, j, this.border);
           this.board.append(_item.elem);
           this.matrix[i][j] = _item.elem;
           _item.elem.data({
@@ -431,7 +436,7 @@
   */
 
 
-  window.eur00t.jewel.Game.prototype._destroyAt = function(i, j, hidden, initial) {
+  window.eur00t.jewels.Game.prototype._destroyAt = function(i, j, hidden, initial) {
     var destroyObj, destroyedFlag;
     this.destroyV = [];
     this.destroyH = [];
@@ -440,8 +445,23 @@
       this._destroyLinearHorizontal(i, j, hidden);
       destroyObj = this._processDestroyResult(hidden);
       destroyedFlag = destroyObj.destroyed;
+      /*
+            Item at (i, j) should be destroyed only if:
+            - number of destroyed element are 3 (including current);
+            OR
+            - (i, j) is special object
+      */
+
       if ((destroyedFlag && ((destroyObj.count < 3) || !initial)) || (destroyedFlag && (this.matrix[i][j] !== null) && (this._processSpecial(i, j)))) {
         this._destroyObj(i, j, hidden);
+        /*
+                In case (i, j) wasn't destroyed after previous check AND
+                destruction process is initiated by user AND
+                element were destroyed (in this case destroyObj.count is more than 2)
+                
+                (i, j) should be destroyed and should be transformed into special element
+        */
+
       } else if ((this.matrix[i][j] !== null) && initial && destroyedFlag) {
         this.matrix[i][j].addClass('special');
         if (destroyObj.count === 3) {
@@ -456,7 +476,7 @@
           this.matrix[i][j].addClass('colorbomb');
         }
       }
-      if (!hidden) {
+      if (!hidden && destroyedFlag) {
         this._refreshScores();
       }
       return {
@@ -471,7 +491,16 @@
     }
   };
 
-  window.eur00t.jewel.Game.prototype._clearBoard = function(hidden) {
+  window.eur00t.jewels.Game.prototype._processWave = function(i) {
+    if (i != null) {
+      this.waveNumber = 0;
+    } else {
+      this.waveNumber += 1;
+    }
+    return ($(this)).trigger('refresh-wave', this.waveNumber);
+  };
+
+  window.eur00t.jewels.Game.prototype._clearBoard = function(hidden) {
     var destroyedFlag, i, j, _i, _j, _ref, _ref1,
       _this = this;
     destroyedFlag = false;
@@ -484,12 +513,13 @@
     }
     if (destroyedFlag) {
       if (!hidden) {
+        this._processWave();
         setTimeout((function() {
           return _this._compactizeBoard();
-        }), window.eur00t.jewel.SPEED);
+        }), window.eur00t.jewels.SPEED);
         return setTimeout((function() {
           return _this._clearBoard();
-        }), window.eur00t.jewel.SPEED * 2);
+        }), window.eur00t.jewels.SPEED * 2);
       } else {
         this._compactizeBoard();
         return this._clearBoard(hidden);
@@ -497,39 +527,49 @@
     }
   };
 
-  window.eur00t.jewel.Game.prototype._processSpecialBomb = function(i, j) {
+  window.eur00t.jewels.Game.prototype._cancelSpecial = function(i, j) {
+    return this.matrix[i][j].data({
+      special: null
+    });
+  };
+
+  window.eur00t.jewels.Game.prototype._processSpecialBomb = function(i, j) {
     var i0, j0, _i, _j, _ref, _ref1;
+    this._displayMessage('Booooom!', 48);
     for (j0 = _i = 0, _ref = this.boardW; 0 <= _ref ? _i < _ref : _i > _ref; j0 = 0 <= _ref ? ++_i : --_i) {
       if (j0 !== j) {
-        this._destroyObj(i, j0, false, true);
+        this._destroyObj(i, j0);
       }
     }
     for (i0 = _j = 0, _ref1 = this.boardH; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; i0 = 0 <= _ref1 ? ++_j : --_j) {
       if (i0 !== i) {
-        this._destroyObj(i0, j, false, true);
+        this._destroyObj(i0, j);
       }
     }
     return true;
   };
 
-  window.eur00t.jewel.Game.prototype._processSpecialColorBomb = function(i, j) {
+  window.eur00t.jewels.Game.prototype._processSpecialColorBomb = function(i, j) {
     var color, i0, j0, _i, _j, _ref, _ref1;
+    this._displayMessage('Color Bomb!', 48);
     color = this.matrix[i][j].data().color;
     for (j0 = _i = 0, _ref = this.boardW; 0 <= _ref ? _i < _ref : _i > _ref; j0 = 0 <= _ref ? ++_i : --_i) {
       for (i0 = _j = 0, _ref1 = this.boardH; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; i0 = 0 <= _ref1 ? ++_j : --_j) {
         if (((j0 !== j) || (i0 !== i)) && (this.matrix[i0][j0] !== null) && (this.matrix[i0][j0].data().color === color)) {
-          this._destroyObj(i0, j0, false, true);
+          this._destroyObj(i0, j0);
         }
       }
     }
     return true;
   };
 
-  window.eur00t.jewel.Game.prototype._processSpecial = function(i, j) {
-    var data;
+  window.eur00t.jewels.Game.prototype._processSpecial = function(i, j) {
+    var data, specialValue;
     data = this.matrix[i][j].data();
     if (data.special != null) {
-      switch (data.special) {
+      specialValue = data.special;
+      this._cancelSpecial(i, j);
+      switch (specialValue) {
         case 'bomb':
           this._processSpecialBomb(i, j);
           break;
@@ -542,7 +582,39 @@
     }
   };
 
-  window.eur00t.jewel.Game.prototype._initialize = function() {
+  window.eur00t.jewels.Game.prototype._displayMessage = function(text, size) {
+    var waveMessage;
+    waveMessage = $(eur00t.compiledTemplates.jewels.message({
+      text: text,
+      size: size
+    }));
+    this.jQueryContainer.append(waveMessage);
+    return setTimeout((function() {
+      return waveMessage.remove();
+    }), 800);
+  };
+
+  /*
+    Initialize system events. jQuery custom event is used.
+    All events are triggered on instantiated Game object.
+    
+    'refresh-wave'   - fired every time wave value is changed
+    'refresh-scores' - fired on scores change
+  */
+
+
+  window.eur00t.jewels.Game.prototype._initializeEvent = function() {
+    ($(this)).on('refresh-wave', function(e, wave) {
+      if (wave !== 0) {
+        return this._displayMessage("Wave " + wave + "!", 12 + 6 * wave);
+      }
+    });
+    return ($(this)).on('refresh-scores', function(e, scores) {
+      return this.scoresIndicator.children('h2').text(scores);
+    });
+  };
+
+  window.eur00t.jewels.Game.prototype._initialize = function() {
     var _this = this;
     this.jQueryContainer.append(this.scoresIndicator);
     this.jQueryContainer.append(this.board);
@@ -572,12 +644,13 @@
           })(_this.selected.i, _this.selected.j);
           return _this._cancelPreviousSelect();
         } else {
+          _this._processWave(0);
           setTimeout((function() {
             return _this._compactizeBoard();
-          }), window.eur00t.jewel.SPEED);
+          }), window.eur00t.jewels.SPEED);
           setTimeout((function() {
             return _this._clearBoard();
-          }), window.eur00t.jewel.SPEED * 2);
+          }), window.eur00t.jewels.SPEED * 2);
           return _this._cancelPreviousSelect();
         }
       }

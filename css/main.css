@@ -69,37 +69,37 @@
 
 @-moz-keyframes colorbomb-anim {
 	0% {
-		-moz-transform: scale(1);
+		opacity: 1;
 	}
 	50% {
-		-moz-transform: scale(1.2);
+		opacity: 0.2;
 	}
 	100% {
-		-moz-transform: scale(1);
+		opacity: 1;
 	}
 }
 
 @-ms-keyframes colorbomb-anim {
 	0% {
-		-ms-transform: scale(1);
+		opacity: 1;
 	}
 	50% {
-		-ms-transform: scale(1.2);
+		opacity: 0.2;
 	}
 	100% {
-		-ms-transform: scale(1);
+		opacity: 1;
 	}
 }
 
 @-o-keyframes colorbomb-anim {
 	0% {
-		-o-transform: scale(1);
+		opacity: 1;
 	}
 	50% {
-		-o-transform: scale(1.2);
+		opacity: 0.2;
 	}
 	100% {
-		-o-transform: scale(1);
+		opacity: 1;
 	}
 }
 			
@@ -254,3 +254,84 @@ h2.scores {
 
 .jewel.selected {
 	opacity: 0.7;
+}
+
+@-webkit-keyframes font-size-anim {
+	from {
+		font-size: 100%;
+		opacity: 1;
+	}
+	to {
+		font-size: 200%;
+		opacity: 0;
+	}
+}
+
+@-moz-keyframes font-size-anim {
+	from {
+		font-size: 24px;
+		opacity: 1;
+	}
+	to {
+		font-size: 72px;
+		opacity: 0;
+	}
+}
+
+@-ms-keyframes font-size-anim {
+	from {
+		font-size: 24px;
+		opacity: 1;
+	}
+	to {
+		font-size: 72px;
+		opacity: 0;
+	}
+}
+
+@-o-keyframes font-size-anim {
+	from {
+		font-size: 24px;
+		opacity: 1;
+	}
+	to {
+		font-size: 72px;
+		opacity: 0;
+	}
+}
+
+@keyframes font-size-anim {
+	from {
+		font-size: 24px;
+		opacity: 1;
+	}
+	to {
+		font-size: 72px;
+		opacity: 0;
+	}
+}
+
+.message-container {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+}
+
+.message-container .message {
+	position: absolute;
+	width: 640px;
+	
+	top: -24px;
+	left: -320px;
+	
+	animation: font-size-anim 1000ms;
+	
+	-webkit-animation: font-size-anim 1000ms;
+	-moz-animation: font-size-anim 1000ms;
+	-ms-animation: font-size-anim 1000ms;
+	-o-animation: font-size-anim 1000ms;
+	
+	font: normal 100% 'Spirax', cursive;
+	text-shadow: 1px 1px 0px white;
+	text-align: center;
+}
