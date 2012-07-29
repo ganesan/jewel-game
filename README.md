@@ -1,4 +1,4 @@
-Jewels Game
+Jewels Game (development branch)
 ===========
 by [eur00t](http://www.eur00t.com), live version: [http://jewels.eur00t.com](http://jewels.eur00t.com)
 
